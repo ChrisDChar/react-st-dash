@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import TeacherCard from '../components/TeacherCard';
 
 export default function Teachers() {
@@ -14,6 +14,25 @@ export default function Teachers() {
     search: ''
   });
   const [professions, setProfessions] = useState([]);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editTeacher, setEditTeacher] = useState(null);
+  const [newTeacher, setNewTeacher] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    gender: 'male',
+    experience: '',
+    rating: '',
+    phone: '',
+    age: '',
+    avatar: '',
+    twitter: '',
+    linkedin: ''
+  });
+  
+  const editModalRef = useRef(null);
+  const addModalRef = useRef(null);
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -38,6 +57,22 @@ export default function Teachers() {
     fetchTeachers();
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (editModalOpen && editModalRef.current && !editModalRef.current.contains(event.target)) {
+        setEditModalOpen(false);
+      }
+      if (addModalOpen && addModalRef.current && !addModalRef.current.contains(event.target)) {
+        setAddModalOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [editModalOpen, addModalOpen]);
+
   const filteredTeachers = teachers.filter(teacher => {
     if (filters.search && !teacher.name.toLowerCase().includes(filters.search.toLowerCase()) &&
         !teacher.email.toLowerCase().includes(filters.search.toLowerCase()) &&
@@ -46,7 +81,7 @@ export default function Teachers() {
     }
 
     if (filters.gender !== 'all') {
-      const teacherGender = typeof teacher.gender === 'boolean' ? (teacher.gender ? 'male' : 'female') : teacher.gender.toLowerCase();
+      const teacherGender = teacher.gender === true || teacher.gender === 'male' ? 'male' : 'female';
       if (teacherGender !== filters.gender) return false;
     }
 
@@ -96,8 +131,103 @@ export default function Teachers() {
     }
   };
 
-  const handleEdit = (id) => {
-    
+  const handleEdit = (teacher) => {
+    setEditTeacher({
+      ...teacher,
+      gender: teacher.gender === true || teacher.gender === 'male' ? 'male' : 'female'
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const teacherToUpdate = {
+        ...editTeacher,
+        gender: editTeacher.gender === 'male',
+        rating: parseFloat(editTeacher.rating) || 0,
+        experience: parseInt(editTeacher.experience) || 0,
+        age: parseInt(editTeacher.age) || 30
+      };
+
+      const res = await fetch(`https://692376893ad095fb84709f35.mockapi.io/teachers/${editTeacher.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(teacherToUpdate)
+      });
+      
+      if (!res.ok) throw new Error('Failed to update teacher');
+      const updatedTeacher = await res.json();
+      setTeachers(prev => prev.map(t => t.id === updatedTeacher.id ? updatedTeacher : t));
+      setEditModalOpen(false);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAddSubmit = async () => {
+    try {
+      const teacherToAdd = {
+        ...newTeacher,
+        gender: newTeacher.gender === 'male',
+        rating: parseFloat(newTeacher.rating) || 0,
+        experience: parseInt(newTeacher.experience) || 0,
+        age: parseInt(newTeacher.age) || 30
+      };
+
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(teacherToAdd)
+      };
+
+      const res = await fetch('https://692376893ad095fb84709f35.mockapi.io/teachers', requestOptions);
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(`Failed to add teacher: ${res.status} ${res.statusText}`);
+      }
+      
+      const addedTeacher = await res.json();
+      setTeachers(prev => [...prev, addedTeacher]);
+      setAddModalOpen(false);
+      
+      setNewTeacher({
+        name: '',
+        email: '',
+        subject: '',
+        gender: 'male',
+        experience: '',
+        rating: '',
+        phone: '',
+        age: '',
+        avatar: '',
+        twitter: '',
+        linkedin: ''
+      });
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAddClick = () => {
+    setAddModalOpen(true);
+  };
+
+  const resetNewTeacher = () => {
+    setNewTeacher({
+      name: '',
+      email: '',
+      subject: '',
+      gender: 'male',
+      experience: '',
+      rating: '',
+      phone: '',
+      age: '',
+      avatar: '',
+      twitter: '',
+      linkedin: ''
+    });
+    setAddModalOpen(false);
   };
 
   if (loading) {
@@ -125,7 +255,10 @@ export default function Teachers() {
             Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, sortedTeachers.length)} of {sortedTeachers.length} teachers
           </p>
         </div>
-        <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+        <button 
+          onClick={handleAddClick}
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+        >
           Add Teacher
         </button>
       </div>
@@ -196,7 +329,7 @@ export default function Teachers() {
             <TeacherCard
               key={teacher.id}
               teacher={teacher}
-              onEdit={handleEdit}
+              onEdit={() => handleEdit(teacher)}
               onDelete={handleDelete}
             />
           ))}
@@ -234,6 +367,285 @@ export default function Teachers() {
           >
             Next
           </button>
+        </div>
+      )}
+
+      {editModalOpen && editTeacher && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div ref={editModalRef} className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-2xl shadow-lg space-y-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white text-center">Edit Teacher</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={editTeacher.name}
+                  onChange={e => setEditTeacher({...editTeacher, name: e.target.value})}
+                  placeholder="Teacher Name"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={editTeacher.email}
+                  onChange={e => setEditTeacher({...editTeacher, email: e.target.value})}
+                  placeholder="Email"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Subject</label>
+                <input
+                  type="text"
+                  value={editTeacher.subject}
+                  onChange={e => setEditTeacher({...editTeacher, subject: e.target.value})}
+                  placeholder="Subject"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Gender</label>
+                <select
+                  value={editTeacher.gender}
+                  onChange={e => setEditTeacher({...editTeacher, gender: e.target.value})}
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Experience</label>
+                <input
+                  type="number"
+                  value={editTeacher.experience}
+                  onChange={e => setEditTeacher({...editTeacher, experience: e.target.value})}
+                  placeholder="Years of Experience"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Rating</label>
+                <input
+                  type="number"
+                  value={editTeacher.rating}
+                  onChange={e => setEditTeacher({...editTeacher, rating: e.target.value})}
+                  placeholder="Rating"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                <input
+                  type="tel"
+                  value={editTeacher.phone || ''}
+                  onChange={e => setEditTeacher({...editTeacher, phone: e.target.value})}
+                  placeholder="Phone Number"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Age</label>
+                <input
+                  type="number"
+                  value={editTeacher.age}
+                  onChange={e => setEditTeacher({...editTeacher, age: e.target.value})}
+                  placeholder="Age"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Twitter</label>
+                <input
+                  type="text"
+                  value={editTeacher.twitter || ''}
+                  onChange={e => setEditTeacher({...editTeacher, twitter: e.target.value})}
+                  placeholder="Twitter Handle"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">LinkedIn</label>
+                <input
+                  type="text"
+                  value={editTeacher.linkedin || ''}
+                  onChange={e => setEditTeacher({...editTeacher, linkedin: e.target.value})}
+                  placeholder="LinkedIn Profile"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {addModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div ref={addModalRef} className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-2xl shadow-lg space-y-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white text-center">Add New Teacher</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={newTeacher.name}
+                  onChange={e => setNewTeacher({...newTeacher, name: e.target.value})}
+                  placeholder="Teacher Name"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newTeacher.email}
+                  onChange={e => setNewTeacher({...newTeacher, email: e.target.value})}
+                  placeholder="Email"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Subject</label>
+                <input
+                  type="text"
+                  value={newTeacher.subject}
+                  onChange={e => setNewTeacher({...newTeacher, subject: e.target.value})}
+                  placeholder="Subject"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Gender</label>
+                <select
+                  value={newTeacher.gender}
+                  onChange={e => setNewTeacher({...newTeacher, gender: e.target.value})}
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Experience</label>
+                <input
+                  type="number"
+                  value={newTeacher.experience}
+                  onChange={e => setNewTeacher({...newTeacher, experience: e.target.value})}
+                  placeholder="Years of Experience"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Rating</label>
+                <input
+                  type="number"
+                  value={newTeacher.rating}
+                  onChange={e => setNewTeacher({...newTeacher, rating: e.target.value})}
+                  placeholder="Rating"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                <input
+                  type="tel"
+                  value={newTeacher.phone}
+                  onChange={e => setNewTeacher({...newTeacher, phone: e.target.value})}
+                  placeholder="Phone Number"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Age</label>
+                <input
+                  type="number"
+                  value={newTeacher.age}
+                  onChange={e => setNewTeacher({...newTeacher, age: e.target.value})}
+                  placeholder="Age"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">Twitter</label>
+                <input
+                  type="text"
+                  value={newTeacher.twitter}
+                  onChange={e => setNewTeacher({...newTeacher, twitter: e.target.value})}
+                  placeholder="Twitter Handle"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-gray-700 dark:text-gray-300 mb-1">LinkedIn</label>
+                <input
+                  type="text"
+                  value={newTeacher.linkedin}
+                  onChange={e => setNewTeacher({...newTeacher, linkedin: e.target.value})}
+                  placeholder="LinkedIn Profile"
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={resetNewTeacher}
+                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddSubmit}
+                disabled={!newTeacher.name || !newTeacher.email || !newTeacher.subject}
+                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Teacher
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -11,7 +11,7 @@ export default function StudentCard({ student, onEdit, onDelete }) {
   const displayGender = typeof student.gender === 'string' ? student.gender : (student.gender ? 'Male' : 'Female');
 
   return (
-    <div 
+    <div
       className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
       onClick={() => navigate(`/students/${student.id}`)}
     >
@@ -90,7 +90,7 @@ export default function StudentCard({ student, onEdit, onDelete }) {
 
       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
-          onClick={(e) => { e.stopPropagation(); onEdit(student.id); }}
+          onClick={(e) => { e.stopPropagation(); onEdit(student); }}
           className="flex-1 px-4 py-2 text-sm border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
         >
           Edit

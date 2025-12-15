@@ -1,14 +1,22 @@
+import { useNavigate } from 'react-router-dom';
+
 export default function TeacherCard({ teacher, onEdit, onDelete }) {
+  const navigate = useNavigate();
+
   const getInitials = (name) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   };
 
-  const displayGender = typeof teacher.gender === 'boolean' ? (teacher.gender ? 'Male' : 'Female') : teacher.gender;
+  const handleCardClick = () => {
+    navigate(`/teachers/${teacher.id}`);
+  };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+    <div
+      onClick={handleCardClick}
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+    >
       <div className="flex flex-col items-center text-center mb-4">
-        {/* Avatar */}
         <div className="relative h-20 w-20 mb-3">
           {teacher.avatar ? (
             <img src={teacher.avatar} alt={teacher.name} className="w-full h-full rounded-full object-cover ring-4 ring-blue-100 dark:ring-blue-900" />
@@ -19,15 +27,12 @@ export default function TeacherCard({ teacher, onEdit, onDelete }) {
           )}
         </div>
 
-        {/* Name */}
         <h3 className="text-gray-900 dark:text-white font-semibold mb-1">{teacher.name}</h3>
 
-        {/* Subject */}
         <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-medium rounded mb-3">
           {teacher.subject}
         </span>
 
-        {/* Experience & Age */}
         <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400 mb-3">
           <span className="flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -45,7 +50,6 @@ export default function TeacherCard({ teacher, onEdit, onDelete }) {
           </span>
         </div>
 
-        {/* Rating */}
         <div className="flex items-center gap-1 mb-2">
           <svg className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24">
             <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
@@ -53,7 +57,6 @@ export default function TeacherCard({ teacher, onEdit, onDelete }) {
           <span className="text-gray-900 dark:text-white">{teacher.rating}</span>
         </div>
 
-        {/* Rating Bar */}
         <div className="w-full space-y-2 mb-4">
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div className="bg-black dark:bg-white h-2 rounded-full" style={{width: `${Math.min((teacher.rating / 5) * 100, 100)}%`}} />
@@ -61,7 +64,6 @@ export default function TeacherCard({ teacher, onEdit, onDelete }) {
         </div>
       </div>
 
-      {/* Contact Info */}
       <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -85,7 +87,7 @@ export default function TeacherCard({ teacher, onEdit, onDelete }) {
         </div>
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 a2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
             <rect width="4" height="12" x="2" y="9" />
             <circle cx="4" cy="4" r="2" />
           </svg>
@@ -93,10 +95,9 @@ export default function TeacherCard({ teacher, onEdit, onDelete }) {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
-          onClick={(e) => { e.stopPropagation(); onEdit(teacher.id); }}
+          onClick={(e) => { e.stopPropagation(); onEdit(teacher); }}
           className="flex-1 px-4 py-2 text-sm border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
         >
           Edit
