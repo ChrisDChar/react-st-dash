@@ -37,7 +37,7 @@ export default function Layout() {
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} />
       
-      <div className={`flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
+      <div className={`flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'ml-25' : 'ml-64'}`}>
         <Header isDark={isDark} onToggleTheme={toggleTheme} />
         
         <main className="p-6">
