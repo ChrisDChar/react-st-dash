@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 export default function Layout() {
   const [isDark, setIsDark] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -34,9 +35,9 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar />
+      <Sidebar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} />
       
-      <div className="flex-1 ml-64">
+      <div className={`flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
         <Header isDark={isDark} onToggleTheme={toggleTheme} />
         
         <main className="p-6">
