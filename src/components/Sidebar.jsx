@@ -59,10 +59,8 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
 
   return (
     <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-gray-900 min-h-screen fixed left-0 top-0 bottom-0 flex flex-col transition-all duration-300 z-50`}>
-      {/* Logo and Toggle Button Section */}
       <div className={`${isCollapsed ? 'px-4' : 'px-6'} py-6 transition-all duration-300`}>
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
@@ -72,25 +70,21 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
               </svg>
             </div>
             
-            {/* Text appears/disappears based on collapse state */}
             <span className={`text-white text-xl font-bold whitespace-nowrap transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
               Edu Admin
             </span>
           </div>
           
-          {/* Toggle Button - moves based on collapse state */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={`text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${isCollapsed ? 'ml-10' : ''}`}
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
             {isCollapsed ? (
-              // Expand Icon (ChevronRight)
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m9 18 6-6-6-6"/>
               </svg>
             ) : (
-              // Collapse Icon (ChevronLeft)
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m15 18-6-6 6-6"/>
               </svg>
@@ -99,7 +93,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className={`space-y-2 flex-1 ${isCollapsed ? 'px-3' : 'px-6'} transition-all duration-300`}>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path);
@@ -123,7 +116,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
                 {item.icon}
               </div>
               
-              {/* Text appears/disappears based on collapse state */}
               {!isCollapsed && (
                 <span className="font-medium whitespace-nowrap">
                   {item.label}
@@ -134,7 +126,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
         })}
       </nav>
 
-      {/* Logout Button */}
       <div className={`${isCollapsed ? 'px-3' : 'px-6'} pb-6 transition-all duration-300`}>
         <button
           onClick={handleLogout}
@@ -153,7 +144,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
             </svg>
           </div>
           
-          {/* Text appears/disappears based on collapse state */}
           {!isCollapsed && (
             <span className="font-medium whitespace-nowrap">
               Logout
