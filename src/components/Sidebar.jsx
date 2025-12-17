@@ -9,7 +9,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
       path: '/dashboard',
       label: 'Dashboard',
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-layout-dashboard h-5 w-5 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-layout-dashboard h-5 w-5 shrink-0">
           <rect width="7" height="9" x="3" y="3" rx="1"></rect>
           <rect width="7" height="5" x="14" y="3" rx="1"></rect>
           <rect width="7" height="9" x="14" y="12" rx="1"></rect>
@@ -21,7 +21,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
       path: '/teachers',
       label: 'Teachers',
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users h-5 w-5 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users h-5 w-5 shrink-0">
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
           <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
           <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -33,7 +33,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
       path: '/students',
       label: 'Students',
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-graduation-cap h-5 w-5 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-graduation-cap h-5 w-5 shrink-0">
           <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
           <path d="M22 10v6"></path>
           <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
@@ -44,7 +44,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
       path: '/settings',
       label: 'Settings',
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings h-5 w-5 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings h-5 w-5 shrink-0">
           <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l-.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
@@ -62,7 +62,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
       <div className={`${isCollapsed ? 'px-4' : 'px-6'} py-6 transition-all duration-300`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                 <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
                 <path d="M22 10v6"></path>
@@ -77,7 +77,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
           
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${isCollapsed ? 'ml-10' : ''}`}
+            className={`text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-lg transition-all duration-300 shrink-0 ${isCollapsed ? 'ml-10' : ''}`}
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
             {isCollapsed ? (
@@ -112,7 +112,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
               }`}
               title={isCollapsed ? item.label : ''}
             >
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {item.icon}
               </div>
               
@@ -136,7 +136,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
           }`}
           title={isCollapsed ? 'Logout' : ''}
         >
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out h-5 w-5">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
