@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import TeacherCard from '../components/TeacherCard';
+import { useFetch } from '../hooks/useFetch';
 
 export default function Teachers() {
-  const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: teachers, setData: setTeachers, loading, error } = useFetch('/teachers');
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     gender: 'all',
@@ -36,26 +36,11 @@ export default function Teachers() {
   const itemsPerPage = 8;
 
   useEffect(() => {
-    async function fetchTeachers() {
-      setLoading(true);
-      try {
-        const res = await fetch('https://692376893ad095fb84709f35.mockapi.io/teachers');
-        if (!res.ok) throw new Error('Failed to fetch teachers');
-        const data = await res.json();
-        setTeachers(data);
-        
-        const uniqueProfessions = [...new Set(data.map(t => t.subject))];
-        setProfessions(uniqueProfessions);
-        
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    if (teachers.length > 0) {
+      const uniqueProfessions = [...new Set(teachers.map(t => t.subject))];
+      setProfessions(uniqueProfessions);
     }
-    fetchTeachers();
-  }, []);
+  }, [teachers]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -174,19 +159,13 @@ export default function Teachers() {
         age: parseInt(newTeacher.age) || 30
       };
 
-      const requestOptions = {
+      const res = await fetch('https://692376893ad095fb84709f35.mockapi.io/teachers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(teacherToAdd)
-      };
-
-      const res = await fetch('https://692376893ad095fb84709f35.mockapi.io/teachers', requestOptions);
+      });
       
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(`Failed to add teacher: ${res.status} ${res.statusText}`);
-      }
-      
+      if (!res.ok) throw new Error('Failed to add teacher');
       const addedTeacher = await res.json();
       setTeachers(prev => [...prev, addedTeacher]);
       setAddModalOpen(false);
@@ -257,7 +236,7 @@ export default function Teachers() {
         </div>
         <button 
           onClick={handleAddClick}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition cursor-pointer"
         >
           Add Teacher
         </button>
@@ -276,7 +255,7 @@ export default function Teachers() {
           <select
             value={filters.gender}
             onChange={(e) => setFilters({...filters, gender: e.target.value})}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer"
           >
             <option value="all">All Gender</option>
             <option value="male">Male Only</option>
@@ -286,7 +265,7 @@ export default function Teachers() {
           <select
             value={filters.experience}
             onChange={(e) => setFilters({...filters, experience: e.target.value})}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer"
           >
             <option value="all">All Experience</option>
             <option value="0-5">0-5 years</option>
@@ -298,7 +277,7 @@ export default function Teachers() {
           <select
             value={filters.profession}
             onChange={(e) => setFilters({...filters, profession: e.target.value})}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer"
           >
             <option value="all">All Professions</option>
             {professions.map(prof => (
@@ -309,7 +288,7 @@ export default function Teachers() {
           <select
             value={filters.rating}
             onChange={(e) => setFilters({...filters, rating: e.target.value})}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer"
           >
             <option value="all">All Rating</option>
             <option value="highest">Highest First</option>
@@ -341,7 +320,7 @@ export default function Teachers() {
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -350,7 +329,7 @@ export default function Teachers() {
             <button
               key={i + 1}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 border rounded-lg ${
+              className={`px-4 py-2 border rounded-lg cursor-pointer ${
                 currentPage === i + 1
                   ? 'bg-blue-500 text-white border-blue-500'
                   : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -363,7 +342,7 @@ export default function Teachers() {
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
@@ -494,13 +473,13 @@ export default function Teachers() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setEditModalOpen(false)}
-                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleEditSubmit}
-                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition"
+                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 cursor-pointer transition"
               >
                 Save Changes
               </button>
@@ -633,14 +612,14 @@ export default function Teachers() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={resetNewTeacher}
-                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddSubmit}
                 disabled={!newTeacher.name || !newTeacher.email || !newTeacher.subject}
-                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add Teacher
               </button>

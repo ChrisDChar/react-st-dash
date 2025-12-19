@@ -77,7 +77,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
           
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-lg transition-all duration-300 shrink-0 ${isCollapsed ? 'ml-10' : ''}`}
+            className={`text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-lg transition-all duration-300 cursor-pointer shrink-0 ${isCollapsed ? 'ml-10' : ''}`}
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
             {isCollapsed ? (
@@ -129,7 +129,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
       <div className={`${isCollapsed ? 'px-3' : 'px-6'} pb-6 transition-all duration-300`}>
         <button
           onClick={handleLogout}
-          className={`flex items-center w-full rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all ${
+          className={`flex items-center w-full rounded-lg text-gray-300 hover:bg-red-600 hover:text-white cursor-pointer transition-all ${
             isCollapsed 
               ? 'justify-center px-3 py-3' 
               : 'gap-3 px-4 py-3'

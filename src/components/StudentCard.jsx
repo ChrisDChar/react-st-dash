@@ -91,13 +91,13 @@ export default function StudentCard({ student, onEdit, onDelete }) {
       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
           onClick={(e) => { e.stopPropagation(); onEdit(student); }}
-          className="flex-1 px-4 py-2 text-sm border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
+          className="flex-1 px-4 py-2 text-sm border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition cursor-pointer"
         >
           Edit
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(student.id); }}
-          className="flex-1 px-4 py-2 text-sm border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+          className="flex-1 px-4 py-2 text-sm border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition cursor-pointer"
         >
           Delete
         </button>

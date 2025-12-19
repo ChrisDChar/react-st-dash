@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import StudentCard from '../components/StudentCard';
+import { useFetch } from '../hooks/useFetch';
 
 export default function Students() {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     gender: 'all',
@@ -33,23 +31,8 @@ export default function Students() {
   const addModalRef = useRef(null);
   const itemsPerPage = 8;
 
-  useEffect(() => {
-    async function fetchStudents() {
-      setLoading(true);
-      try {
-        const res = await fetch('https://692376893ad095fb84709f35.mockapi.io/students');
-        if (!res.ok) throw new Error('Failed to fetch students');
-        const data = await res.json();
-        setStudents(data);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchStudents();
-  }, []);
+  const { data: students, setData: setStudents, loading, error } = useFetch('/students');
+
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -96,16 +79,24 @@ export default function Students() {
     if (currentPage > totalPages && totalPages > 0) setCurrentPage(1);
   }, [currentPage, totalPages]);
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this student?')) return;
-    try {
-      const res = await fetch(`https://692376893ad095fb84709f35.mockapi.io/students/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete');
-      setStudents(prev => prev.filter(s => s.id !== id));
-    } catch {
-      alert('Failed to delete student');
-    }
-  };
+  const handleDelete = async (studentId) => {
+  if (!confirm('Are you sure you want to delete this student?')) return;
+  try {
+    const teachersRes = await fetch('https://692376893ad095fb84709f35.mockapi.io/teachers');
+    const teachers = await teachersRes.json();
+    const teacher = teachers.find(t => t.students.some(s => s.id === studentId));
+    if (!teacher) throw new Error('Teacher not found');
+
+    const res = await fetch(`https://692376893ad095fb84709f35.mockapi.io/teachers/${teacher.id}/students/${studentId}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete');
+
+    setStudents(prev => prev.filter(s => s.id !== studentId));
+  } catch {
+    alert('Failed to delete student');
+  }
+};
+
+
 
   const handleEdit = (student) => {
     setEditStudent({...student});
@@ -204,7 +195,7 @@ export default function Students() {
         </div>
         <button 
           onClick={handleAddClick}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition cursor-pointer"
         >
           Add Student
         </button>
@@ -213,22 +204,22 @@ export default function Students() {
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input type="text" placeholder="Search students..." value={filters.search} onChange={e => setFilters({...filters, search: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
-          <select value={filters.gender} onChange={e => setFilters({...filters, gender: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+          <select value={filters.gender} onChange={e => setFilters({...filters, gender: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer">
             <option value="all">All Gender</option>
             <option value="male">Male Only</option>
             <option value="female">Female Only</option>
           </select>
-          <select value={filters.grade} onChange={e => setFilters({...filters, grade: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+          <select value={filters.grade} onChange={e => setFilters({...filters, grade: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer">
             <option value="all">All Grades</option>
             {[...Array(12)].map((_, i) => <option key={i + 1} value={i + 1}>Grade {i + 1}</option>)}
           </select>
-          <select value={filters.age} onChange={e => setFilters({...filters, age: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+          <select value={filters.age} onChange={e => setFilters({...filters, age: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer">
             <option value="all">All Ages</option>
             <option value="6-10">6-10 years</option>
             <option value="11-14">11-14 years</option>
             <option value="15-18">15-18 years</option>
           </select>
-          <select value={filters.rating} onChange={e => setFilters({...filters, rating: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+          <select value={filters.rating} onChange={e => setFilters({...filters, rating: e.target.value})} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer">
             <option value="all">All Rating</option>
             <option value="highest">Highest First</option>
             <option value="lowest">Lowest First</option>
@@ -251,11 +242,11 @@ export default function Students() {
 
       {totalPages > 1 && (
         <div className="flex justify-center items-center space-x-2">
-          <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+          <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">Previous</button>
           {[...Array(totalPages)].map((_, i) => (
-            <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-4 py-2 border rounded-lg ${currentPage === i + 1 ? 'bg-purple-500 text-white border-purple-500' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>{i + 1}</button>
+            <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-4 py-2 border rounded-lg ${currentPage === i + 1 ? 'bg-purple-500 text-white border-purple-500' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer'}`}>{i + 1}</button>
           ))}
-          <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+          <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">Next</button>
         </div>
       )}
 
@@ -383,13 +374,13 @@ export default function Students() {
       <div className="flex justify-end gap-3">
         <button
           onClick={() => setEditModalOpen(false)}
-          className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+          className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition cursor-pointer"
         >
           Cancel
         </button>
         <button
           onClick={handleEditSubmit}
-          className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition"
+          className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition cursor-pointer"
         >
           Save Changes
         </button>
@@ -522,14 +513,14 @@ export default function Students() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={resetNewStudent}
-                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddSubmit}
                 disabled={!newStudent.name || !newStudent.email}
-                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 Add Student
               </button>
